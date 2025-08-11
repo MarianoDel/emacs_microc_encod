@@ -15,7 +15,9 @@
 // Module Exported Macros ------------------------------------------------------
 
 
-//--- Exported functions ---//
+// Module Exported Functions ---------------------------------------------------
+void Usart_Timeouts (void);
+
 void Usart1Config (void);
 void Usart1Shutdown (void);
 void Usart1Send (char *);

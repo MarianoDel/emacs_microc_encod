@@ -55,7 +55,7 @@ DLIBS =
 
 #
 # Define project name here
-PROJECT = MicroC_encoders
+PROJECT = MicroC_encod
 
 # List C define here
 CORELIBDIR = ./cmsis_core
@@ -65,24 +65,20 @@ LINKER = ./startup_src
 SRC  = ./src/main.c
 SRC += ./src/gpio.c
 SRC += ./src/it.c
-SRC += ./src/adc.c
+# SRC += ./src/adc.c
 SRC += ./src/usart.c
 SRC += ./src/tim.c
-SRC += ./src/dma.c
-SRC += ./src/hard.c
+# SRC += ./src/dma.c
+# SRC += ./src/hard.c
 # SRC += ./src/i2c.c
 SRC += ./src/dac.c
 
-SRC += ./src/dsp.c
-SRC += ./src/comms.c
+# SRC += ./src/dsp.c
+SRC += ./src/comms_main.c
 SRC += ./src/utils.c
 SRC += ./src/test_functions.c
-
-SRC += ./src/neopixel.c
-SRC += ./src/neopixel_driver.c
-
-SRC += ./src/supply.c
-SRC += ./src/boost.c
+SRC += ./src/encoder_utils.c
+SRC += ./src/crc_enc.c
 
 
 ## Core Support

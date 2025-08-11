@@ -11,13 +11,12 @@
 #include <stdlib.h>
 
 
-static unsigned char CharsHex2Int (char ch);
 // Module Functions ------------------------------------------------------------
 //devuelve los numeros de un string, en la posicion number
 //devuelve la cantidad de cifras leidas
 unsigned char StringIsANumberHex (char * pn, unsigned short * number)
 {
-    unsigned char i, j;
+    unsigned char i;
     char new_number [6] = {0};
 
     //no mas de 6 caracteres
@@ -33,7 +32,7 @@ unsigned char StringIsANumberHex (char * pn, unsigned short * number)
     for (j = 0; j < i; j++)
     {
 	unsigned char b = CharsHex2Int (*(new_number + j));
-	calc = (calc << 4) | (b & 0x0f);
+	calc = (b << 4) | (b & 0x0f);
     }
 
     *number = calc;    

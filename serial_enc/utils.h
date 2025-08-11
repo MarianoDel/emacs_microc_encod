@@ -10,11 +10,12 @@
 #define _UTILS_H_
 
 
-//--- Funciones del modulo utils.c -------------------------------------//
-unsigned char StringIsANumberHex (char * pn, unsigned short * number);
+// Module Exported functions ---------------------------------------------------
 unsigned char StringIsANumber (char * pn, unsigned short * number);
 unsigned short GetValue (unsigned char * pn, char delimiter);
 unsigned char StringCheckNumbers (char * str, unsigned char len);
+unsigned char CharsHex2Int (char ch);
+
 
 #endif    /* _UTILS_H_ */
 
