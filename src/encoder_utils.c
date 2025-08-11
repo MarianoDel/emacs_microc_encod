@@ -31,22 +31,22 @@ void Encoder_Process_Buffer(int bytes_read, unsigned char * buff_rx)
 	return;
     }
 
-    sprintf(buff_to_send,"header: ok length: %d ", buff_rx [2]);
+    sprintf(buff_to_send,"header: ok length: %d\r\n", buff_rx [2]);
     UsartMainSend(buff_to_send);
 
     if (buff_rx [3] == 0x10)
     {
 	cmd = CMD_WRITE;
-	UsartMainSend("cmd: write ");
+	UsartMainSend(" cmd: write\r\n");
     }
     else if (buff_rx [3] == 0x03)
     {
 	cmd = CMD_READ;
-	UsartMainSend("cmd: read ");
+	UsartMainSend(" cmd: read\r\n");
     }
     else
     {
-	UsartMainSend("cmd: unknow\n");
+	UsartMainSend(" cmd: unknow\r\n");
 	return;
     }
 	
@@ -84,27 +84,27 @@ void Encoder_Process_Buffer(int bytes_read, unsigned char * buff_rx)
 	    (buff_rx [5] == 0x41) &&
 	    (buff_rx [6] == 0x00))
 	{
-	    UsartMainSend("crc ok ");
+	    UsartMainSend(" crc ok\r\n");
 	}
 	else
 	{
-	    UsartMainSend("crc: nok! ");
+	    UsartMainSend(" crc: nok!\r\n");
 	    r = 1;
 	}
 
 	if ((bytes_read - 3) == buff_rx[2])
 	{
-	    UsartMainSend("len: ok no further data!\n");
+	    UsartMainSend(" len: ok no further data!\r\n");
 	    r = 1;
 	}
 	else if ((bytes_read - 3) > buff_rx[2])
 	{
-	    sprintf(buff_to_send,"len: further data read: %d buffr: %d\n", bytes_read, buff_rx[2]);
+	    sprintf(buff_to_send," len: further data read: %d buffr: %d\r\n", bytes_read, buff_rx[2]);
 	    UsartMainSend(buff_to_send);
 	}
 	else
 	{
-	    sprintf(buff_to_send,"len: nok! read: %d buffr: %d\n", bytes_read, buff_rx[2]);
+	    sprintf(buff_to_send," len: nok! read: %d buffr: %d\r\n", bytes_read, buff_rx[2]);
 	    UsartMainSend(buff_to_send);
 	    r = 1;
 	}
@@ -116,7 +116,7 @@ void Encoder_Process_Buffer(int bytes_read, unsigned char * buff_rx)
 
     if (bytes_read < 15)
     {
-	sprintf(buff_to_send,"length: nok! len: %d\n", bytes_read);
+	sprintf(buff_to_send," length: nok! len: %d\r\n", bytes_read);
 	UsartMainSend(buff_to_send);
 	return;
     }
@@ -124,31 +124,30 @@ void Encoder_Process_Buffer(int bytes_read, unsigned char * buff_rx)
     if ((buff_rx [7] != 0x5a) &&
 	(buff_rx [8] != 0xa5))
     {
-	sprintf(buff_to_send,"header: nok! length: %d\n", buff_rx [9]);
+	sprintf(buff_to_send," header: nok! length: %d\r\n", buff_rx [9]);
 	UsartMainSend(buff_to_send);
 	return;
     }
     
     if (buff_rx [10] != 0x03)
     {
-	sprintf(buff_to_send,"cmd: nok! length: %d\n", buff_rx [9]);
+	sprintf(buff_to_send," cmd: nok! length: %d\r\n", buff_rx [9]);
 	UsartMainSend(buff_to_send);
 	return;	
     }
 
-    sprintf(buff_to_send,"addr read: %02x%02x\n", buff_rx[11], buff_rx[12]);
+    sprintf(buff_to_send," addr read: %02x%02x\r\n", buff_rx[11], buff_rx[12]);
     UsartMainSend(buff_to_send);
-    sprintf(buff_to_send,"bytes read: %02x%02x B: %d\n", buff_rx[13], buff_rx[14], buff_rx[14]);
+    sprintf(buff_to_send," bytes read: %02x%02x B: %d\r\n", buff_rx[13], buff_rx[14], buff_rx[14]);
     UsartMainSend(buff_to_send);
 
     int base = 0;
     for (int i = 0; i < buff_rx[14]; i++)
     {
 	base = i * 2 + 15;
-	sprintf(buff_to_send, "value%d: %02x%02x\n", i + 1, buff_rx[base], buff_rx[base + 1]);
+	sprintf(buff_to_send, "  value%d: %02x%02x\r\n", i + 1, buff_rx[base], buff_rx[base + 1]);
 	UsartMainSend(buff_to_send);
     }
-    
 }
 
 

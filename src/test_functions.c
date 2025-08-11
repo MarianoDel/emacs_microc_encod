@@ -33,7 +33,11 @@ extern volatile unsigned short timer_standby;
 // Module Private Functions ----------------------------------------------------
 void TF_UsartMain_Tx (void);
 void TF_UsartMain_Loop (void);
+void TF_UsartMain_Encoder (unsigned char encoder_number);
 void TF_UsartMain_Encoder1 (void);
+void TF_UsartMain_Encoder2 (void);
+void TF_UsartMain_Encoder3 (void);
+void TF_UsartMain_Encoder4 (void);
 
 
 // Module Functions ------------------------------------------------------------
@@ -41,7 +45,8 @@ void TF_Hardware_Tests (void)
 {
     // TF_UsartMain_Tx ();
     // TF_UsartMain_Loop ();
-    TF_UsartMain_Encoder1 ();
+    // TF_UsartMain_Encoder1 ();
+    TF_UsartMain_Encoder4 ();    
 
 }
 
@@ -94,7 +99,7 @@ void TF_UsartMain_Loop (void)
 }
 
 
-void TF_UsartMain_Encoder1 (void)
+void TF_UsartMain_Encoder (unsigned char encoder_number)
 {
     char buff [100];
     unsigned char bbuff [100];    
@@ -103,7 +108,24 @@ void TF_UsartMain_Encoder1 (void)
     
     UsartMainConfig ();
 
-    UsartEncoder1Config ();
+    switch (encoder_number)
+    {
+    case ENCOD_1:
+	UsartEncoder1Config ();
+	break;
+    case ENCOD_2:
+	UsartEncoder2Config ();	
+	break;
+    case ENCOD_3:
+	UsartEncoder3Config ();	
+	break;
+    case ENCOD_4:
+	UsartEncoder4Config ();	
+	break;
+    }
+
+    sprintf(buff, "\r\n-- USING ENCODER: %d --\r\n", encoder_number + 1);
+    UsartMainSend(buff);
     
     UsartMainSend("\r\nWrite (w) to or Read (r) from Address\r\n");
 
@@ -179,7 +201,8 @@ void TF_UsartMain_Encoder1 (void)
 		if (b == 4)
 		{
 		    UsartMainSend("\r\n");
-		    Encoder_Read_Address(ENCOD_1, addr, bytes_or_value);
+		    // Encoder_Read_Address(ENCOD_1, addr, bytes_or_value);
+		    Encoder_Read_Address(encoder_number, addr, bytes_or_value);		    
 		    timer_standby = 5000;
 		    state = 30;
 		}
@@ -234,7 +257,8 @@ void TF_UsartMain_Encoder1 (void)
 		if (b == 4)
 		{
 		    UsartMainSend("\r\n");		    
-		    Encoder_Write_Address(ENCOD_1, addr, bytes_or_value);
+		    // Encoder_Write_Address(ENCOD_1, addr, bytes_or_value);
+		    Encoder_Write_Address(encoder_number, addr, bytes_or_value);		    
 		    timer_standby = 5000;
 		    state = 30;
 		}
@@ -258,18 +282,86 @@ void TF_UsartMain_Encoder1 (void)
 	}
 
 	// always check rx
-	if (UsartEncoder1HaveData())
+	switch (encoder_number)
 	{
-	    int bytes = 0;
-	    UsartEncoder1HaveDataReset();
-	    bytes = UsartEncoder1ReadBuffer((char *) bbuff, 100);
+	case ENCOD_1:
+	    if (UsartEncoder1HaveData())
+	    {
+		int bytes = 0;
+		UsartEncoder1HaveDataReset();
+		bytes = UsartEncoder1ReadBuffer((char *) bbuff, 100);
 
-	    sprintf(buff, "\r\nget: %d bytes\r\n", bytes);
-	    UsartMainSend(buff);
-	    
-	    Encoder_Process_Buffer(bytes, bbuff);
+		sprintf(buff, "\r\nget: %d bytes\r\n", bytes);
+		UsartMainSend(buff);
+		
+		Encoder_Process_Buffer(bytes, bbuff);
+	    }
+	    break;
+	case ENCOD_2:
+	    if (UsartEncoder2HaveData())
+	    {
+		int bytes = 0;
+		UsartEncoder2HaveDataReset();
+		bytes = UsartEncoder2ReadBuffer((char *) bbuff, 100);
+
+		sprintf(buff, "\r\nget: %d bytes\r\n", bytes);
+		UsartMainSend(buff);
+		
+		Encoder_Process_Buffer(bytes, bbuff);
+	    }	
+	    break;
+	case ENCOD_3:
+	    if (UsartEncoder3HaveData())
+	    {
+		int bytes = 0;
+		UsartEncoder3HaveDataReset();
+		bytes = UsartEncoder3ReadBuffer((char *) bbuff, 100);
+
+		sprintf(buff, "\r\nget: %d bytes\r\n", bytes);
+		UsartMainSend(buff);
+		
+		Encoder_Process_Buffer(bytes, bbuff);
+	    }	
+	    break;
+	case ENCOD_4:
+	    if (UsartEncoder4HaveData())
+	    {
+		int bytes = 0;
+		UsartEncoder4HaveDataReset();
+		bytes = UsartEncoder4ReadBuffer((char *) bbuff, 100);
+
+		sprintf(buff, "\r\nget: %d bytes\r\n", bytes);
+		UsartMainSend(buff);
+		
+		Encoder_Process_Buffer(bytes, bbuff);
+	    }	
+	    break;
 	}
     }
+}
+
+
+void TF_UsartMain_Encoder1 (void)
+{
+    TF_UsartMain_Encoder (ENCOD_1);
+}
+
+
+void TF_UsartMain_Encoder2 (void)
+{
+    TF_UsartMain_Encoder (ENCOD_2);
+}
+
+
+void TF_UsartMain_Encoder3 (void)
+{
+    TF_UsartMain_Encoder (ENCOD_3);
+}
+
+
+void TF_UsartMain_Encoder4 (void)
+{
+    TF_UsartMain_Encoder (ENCOD_4);
 }
 
 

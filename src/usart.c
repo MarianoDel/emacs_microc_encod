@@ -19,15 +19,29 @@
 
 // Private Types Constants and Macros ------------------------------------------
 //---- Configure usart mode of use; TIMEOUT for newline or \r\n
-#define USE_USART1_NEWLINE_BY_TIMEOUT
-// #define USE_USART2_NEWLINE_BY_TIMEOUT
+#define USE_USART1_NEWLINE_BY_TIMEOUT    // on Encoder 1
+#define USE_USART2_NEWLINE_BY_TIMEOUT    // on Encoder 2
 // #define USE_USART3_NEWLINE_BY_TIMEOUT
-// #define USE_UART4_NEWLINE_BY_TIMEOUT
-// #define USE_UART5_NEWLINE_BY_TIMEOUT
+#define USE_UART4_NEWLINE_BY_TIMEOUT    // on Encoder 3
+#define USE_UART5_NEWLINE_BY_TIMEOUT    // on Encoder 4
 
 //---- Configurations Defines --------------------
+// #define SIZEOF_TXDATA        128
+// #define SIZEOF_RXDATA        128
 #define SIZEOF_TXDATA        128
 #define SIZEOF_RXDATA        128
+
+#define SIZEOF_TXDATA1    (SIZEOF_TXDATA)
+#define SIZEOF_TXDATA2    (SIZEOF_TXDATA)
+#define SIZEOF_TXDATA3    (4*SIZEOF_TXDATA)
+#define SIZEOF_TXDATA4    (SIZEOF_TXDATA)
+#define SIZEOF_TXDATA5    (SIZEOF_TXDATA)
+
+#define SIZEOF_RXDATA1    (SIZEOF_RXDATA)
+#define SIZEOF_RXDATA2    (SIZEOF_RXDATA)
+#define SIZEOF_RXDATA3    (4*SIZEOF_RXDATA)
+#define SIZEOF_RXDATA4    (SIZEOF_RXDATA)
+#define SIZEOF_RXDATA5    (SIZEOF_RXDATA)
 
 //---- Common Defines --------------------
 // 0xMMMF    Mantissa MMM Fraction F/16
@@ -41,6 +55,7 @@
 #if defined SYSCLK_FREQ_64MHz
 #define USART_PCKL2_57600    0x0457    // with RC internal
 #define USART_PCKL2_9600    0x1A0A    // with RC internal
+#define USART_PCKL1_57600    0x022B    // with RC internal
 #define USART_PCKL1_9600    0x0D05    // with RC internal
 #elif defined SYSCLK_FREQ_8MHz
 #define USART_PCKL2_9600    0x0341    // with RC internal
@@ -56,10 +71,15 @@
 
 #define USART1_57600        USART_PCKL2_57600
 #define USART1_9600        USART_PCKL2_9600
+#define USART2_57600        USART_PCKL1_57600
 #define USART2_9600        USART_PCKL1_9600
+#define USART3_57600        USART_PCKL1_57600
 #define USART3_9600        USART_PCKL1_9600
+#define UART4_57600        USART_PCKL1_57600
 #define UART4_9600        USART_PCKL1_9600
+#define UART5_57600        USART_PCKL1_57600
 #define UART5_9600        USART_PCKL1_9600
+
 
 
 #define RCC_USART1_CLK    (RCC->APB2ENR & 0x00004000)
@@ -92,8 +112,8 @@
 volatile unsigned char * ptx1;
 volatile unsigned char * ptx1_pckt_index;
 volatile unsigned char * prx1;
-volatile unsigned char tx1buff[4*SIZEOF_TXDATA];
-volatile unsigned char rx1buff[4*SIZEOF_RXDATA];
+volatile unsigned char tx1buff[SIZEOF_TXDATA1];
+volatile unsigned char rx1buff[SIZEOF_RXDATA1];
 volatile unsigned char usart1_have_data = 0;
 #ifdef USE_USART1_NEWLINE_BY_TIMEOUT
 volatile unsigned char usart1_timeout = 0;
@@ -103,8 +123,8 @@ volatile unsigned char usart1_timeout = 0;
 volatile unsigned char * ptx2;
 volatile unsigned char * ptx2_pckt_index;
 volatile unsigned char * prx2;
-volatile unsigned char tx2buff[SIZEOF_TXDATA];
-volatile unsigned char rx2buff[SIZEOF_RXDATA];
+volatile unsigned char tx2buff[SIZEOF_TXDATA2];
+volatile unsigned char rx2buff[SIZEOF_RXDATA2];
 volatile unsigned char usart2_have_data = 0;
 #ifdef USE_USART2_NEWLINE_BY_TIMEOUT
 volatile unsigned char usart2_timeout = 0;
@@ -114,8 +134,8 @@ volatile unsigned char usart2_timeout = 0;
 volatile unsigned char * ptx3;
 volatile unsigned char * ptx3_pckt_index;
 volatile unsigned char * prx3;
-volatile unsigned char tx3buff[SIZEOF_TXDATA];
-volatile unsigned char rx3buff[SIZEOF_RXDATA];
+volatile unsigned char tx3buff[SIZEOF_TXDATA3];
+volatile unsigned char rx3buff[SIZEOF_RXDATA3];
 volatile unsigned char usart3_have_data = 0;
 #ifdef USE_USART3_NEWLINE_BY_TIMEOUT
 volatile unsigned char usart3_timeout = 0;
@@ -126,8 +146,8 @@ volatile unsigned char usart3_timeout = 0;
 volatile unsigned char * ptx4;
 volatile unsigned char * ptx4_pckt_index;
 volatile unsigned char * prx4;
-volatile unsigned char tx4buff[SIZEOF_TXDATA];
-volatile unsigned char rx4buff[SIZEOF_RXDATA];
+volatile unsigned char tx4buff[SIZEOF_TXDATA4];
+volatile unsigned char rx4buff[SIZEOF_RXDATA4];
 volatile unsigned char uart4_have_data = 0;
 #ifdef USE_UART4_NEWLINE_BY_TIMEOUT
 volatile unsigned char uart4_timeout = 0;
@@ -137,8 +157,8 @@ volatile unsigned char uart4_timeout = 0;
 volatile unsigned char * ptx5;
 volatile unsigned char * ptx5_pckt_index;
 volatile unsigned char * prx5;
-volatile unsigned char tx5buff[SIZEOF_TXDATA];
-volatile unsigned char rx5buff[SIZEOF_RXDATA];
+volatile unsigned char tx5buff[SIZEOF_TXDATA5];
+volatile unsigned char rx5buff[SIZEOF_RXDATA5];
 volatile unsigned char uart5_have_data = 0;
 #ifdef USE_UART5_NEWLINE_BY_TIMEOUT
 volatile unsigned char uart5_timeout = 0;
@@ -196,12 +216,6 @@ void Usart1Config(void)
     // USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
     USART1->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;	//para pruebas TX
 
-    //---- Change alternative outputs ----
-    // temp = GPIOA->AFR[1];
-    // temp &= 0xFFFFF00F;
-    // temp |= 0x00000110;	//PA10 -> AF1 PA9 -> AF1
-    // GPIOA->AFR[1] = temp;
-
     //---- Ints Enable and Priority ----
     NVIC_EnableIRQ(USART1_IRQn);
     NVIC_SetPriority(USART1_IRQn, 7);
@@ -232,7 +246,7 @@ void Usart1Send (char * send)
 
 void Usart1SendUnsigned (unsigned char * send, unsigned char size)
 {
-    if ((ptx1_pckt_index + size) < &tx1buff[SIZEOF_TXDATA])
+    if ((ptx1_pckt_index + size) < &tx1buff[SIZEOF_TXDATA1])
     {
         memcpy((unsigned char *)ptx1_pckt_index, send, size);
         ptx1_pckt_index += size;
@@ -308,7 +322,7 @@ void USART1_IRQHandler (void)
     {
         dummy = USART1->DR & 0x0FF;
 
-        if (prx1 < &rx1buff[SIZEOF_RXDATA - 1])
+        if (prx1 < &rx1buff[SIZEOF_RXDATA1 - 1])
         {
 #ifdef USE_USART1_NEWLINE_BY_TIMEOUT	    
 	    *prx1 = dummy;
@@ -341,7 +355,7 @@ void USART1_IRQHandler (void)
     {
         if (USART1->SR & USART_SR_TXE)
         {
-            if ((ptx1 < &tx1buff[SIZEOF_TXDATA]) && (ptx1 < ptx1_pckt_index))
+            if ((ptx1 < &tx1buff[SIZEOF_TXDATA1]) && (ptx1 < ptx1_pckt_index))
             {
                 USART1->DR = *ptx1;
                 ptx1++;
@@ -375,17 +389,11 @@ void Usart2Config(void)
     prx2 = rx2buff;
 
     //---- Configuro velocidad y opciones del puerto
-    USART2->BRR = USART2_9600;
+    USART2->BRR = USART2_57600;
     // USART2->CR2 |= USART_CR2_STOP_1;	//2 bits stop
     // USART2->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
     // USART2->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
     USART2->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;	//para pruebas TX
-
-    //---- Configuro salidas alternativas ----
-    // temp = GPIOA->AFR[1];
-    // temp &= 0xFFFFF00F;
-    // temp |= 0x00000110;	//PA10 -> AF1 PA9 -> AF1
-    // GPIOA->AFR[1] = temp;
 
     //---- Habilito Int y prioridad ----
     NVIC_EnableIRQ(USART2_IRQn);
@@ -417,7 +425,7 @@ void Usart2Send (char * send)
 
 void Usart2SendUnsigned (unsigned char * send, unsigned char size)
 {
-    if ((ptx2_pckt_index + size) < &tx2buff[SIZEOF_TXDATA])
+    if ((ptx2_pckt_index + size) < &tx2buff[SIZEOF_TXDATA2])
     {
         memcpy((unsigned char *)ptx2_pckt_index, send, size);
         ptx2_pckt_index += size;
@@ -431,7 +439,17 @@ unsigned char Usart2ReadBuffer (char * bout, unsigned short max_len)
     unsigned int len;
 
     len = prx2 - rx2buff;
-
+    
+#ifdef USE_USART2_NEWLINE_BY_TIMEOUT    
+    if (len < max_len)
+    {
+	// use orig len
+    }
+    else
+    {
+        len = max_len;
+    }
+#else
     if (len < max_len)
     {
         *prx2 = '\0';    //buffer from int isnt ended with '\0' do it now
@@ -442,6 +460,7 @@ unsigned char Usart2ReadBuffer (char * bout, unsigned short max_len)
         *(bout + max_len - 1) = '\0';
         len = max_len - 1;
     }
+#endif
     
     memcpy(bout, (unsigned char *) rx2buff, len);    
     prx2 = rx2buff;
@@ -450,19 +469,18 @@ unsigned char Usart2ReadBuffer (char * bout, unsigned short max_len)
 }
 
 
-// void ReadUsart2BufferFlush (void)
-// {
-//     if (usart2_have_data)
-//         usart2_have_data = 0;
-    
-//     //ajusto punteros de rx
-//     prx2 = rx2buff;
-// }
-
-
 unsigned char Usart2HaveData (void)
 {
+#ifdef USE_USART2_NEWLINE_BY_TIMEOUT
+    if ((usart2_have_data) &&
+	(!usart2_timeout))
+	return 1;
+    else
+	return 0;
+
+#else
     return usart2_have_data;
+#endif
 }
 
 
@@ -481,8 +499,14 @@ void USART2_IRQHandler (void)
     {
         dummy = USART2->DR & 0x0FF;
 
-        if (prx2 < &rx2buff[SIZEOF_RXDATA - 1])
+        if (prx2 < &rx2buff[SIZEOF_RXDATA2 - 1])
         {
+#ifdef USE_USART2_NEWLINE_BY_TIMEOUT
+	    *prx2 = dummy;
+	    prx2++;
+	    usart2_timeout = USART_RX_TIMEOUT;
+	    usart2_have_data = 1;
+#else
             if (dummy == '\r')    //no le doy bola
             {
             }
@@ -490,17 +514,13 @@ void USART2_IRQHandler (void)
             {
                 *prx2 = '\0';
                 usart2_have_data = 1;
-                // if (LED)
-                // 	LED_OFF;
-                // else
-                // 	LED_ON;
-
             }
             else
             {
                 *prx2 = dummy;
                 prx2++;
             }
+#endif
         }
         else
             prx2 = rx2buff;    //soluciona problema bloqueo con garbage
@@ -511,7 +531,7 @@ void USART2_IRQHandler (void)
     {
         if (USART2->SR & USART_SR_TXE)
         {
-            if ((ptx2 < &tx2buff[SIZEOF_TXDATA]) && (ptx2 < ptx2_pckt_index))
+            if ((ptx2 < &tx2buff[SIZEOF_TXDATA2]) && (ptx2 < ptx2_pckt_index))
             {
                 USART2->DR = *ptx2;
                 ptx2++;
@@ -588,7 +608,7 @@ void Usart3Send (char * send)
 
 void Usart3SendUnsigned (unsigned char * send, unsigned char size)
 {
-    if ((ptx3_pckt_index + size) < &tx3buff[SIZEOF_TXDATA])
+    if ((ptx3_pckt_index + size) < &tx3buff[SIZEOF_TXDATA3])
     {
         memcpy((unsigned char *)ptx3_pckt_index, send, size);
         ptx3_pckt_index += size;
@@ -613,7 +633,7 @@ unsigned char Usart3ReadBuffer (char * bout, unsigned short max_len)
     }
     else
     {
-        memcpy(bout, (unsigned char *) rx3buff, len);
+        memcpy(bout, (unsigned char *) rx3buff, max_len);
         len = max_len;
     }
 
@@ -645,7 +665,7 @@ void USART3_IRQHandler (void)
     {
         dummy = USART3->DR & 0x0FF;
 
-        if (prx3 < &rx3buff[SIZEOF_RXDATA - 1])
+        if (prx3 < &rx3buff[SIZEOF_RXDATA3 - 1])
         {
             // USART3->DR = (unsigned char) dummy;    //para debug
 
@@ -669,7 +689,7 @@ void USART3_IRQHandler (void)
     {
         if (USART3->SR & USART_SR_TXE)
         {
-            if ((ptx3 < &tx3buff[SIZEOF_TXDATA]) && (ptx3 < ptx3_pckt_index))
+            if ((ptx3 < &tx3buff[SIZEOF_TXDATA3]) && (ptx3 < ptx3_pckt_index))
             {
                 USART3->DR = *ptx3;
                 ptx3++;
@@ -705,7 +725,7 @@ void Uart4Config(void)
     prx4 = rx4buff;
 
     //---- Configuro velocidad y opciones del puerto
-    UART4->BRR = UART4_9600;
+    UART4->BRR = UART4_57600;
     // UART4->CR2 |= USART_CR2_STOP_1;	//2 bits stop
     // UART4->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
     // UART4->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
@@ -748,7 +768,7 @@ void Uart4Send (char * send)
 
 void Uart4SendUnsigned (unsigned char * send, unsigned char size)
 {
-    if ((ptx4_pckt_index + size) < &tx4buff[SIZEOF_TXDATA])
+    if ((ptx4_pckt_index + size) < &tx4buff[SIZEOF_TXDATA4])
     {
         memcpy((unsigned char *)ptx4_pckt_index, send, size);
         ptx4_pckt_index += size;
@@ -763,6 +783,15 @@ unsigned char Uart4ReadBuffer (char * bout, unsigned short max_len)
 
     len = prx4 - rx4buff;
 
+#ifdef USE_UART4_NEWLINE_BY_TIMEOUT
+    if (len < max_len)
+        memcpy(bout, (unsigned char *) rx4buff, len);
+    else
+    {
+        memcpy(bout, (unsigned char *) rx4buff, max_len);
+        len = max_len;
+    }
+#else    
     if (len < max_len)
     {
         //el prx4 siempre llega adelantado desde la int, lo corto con un 0
@@ -773,9 +802,10 @@ unsigned char Uart4ReadBuffer (char * bout, unsigned short max_len)
     }
     else
     {
-        memcpy(bout, (unsigned char *) rx4buff, len);
+        memcpy(bout, (unsigned char *) rx4buff, max_len);
         len = max_len;
     }
+#endif
 
     //ajusto punteros de rx luego de la copia
     prx4 = rx4buff;
@@ -786,7 +816,16 @@ unsigned char Uart4ReadBuffer (char * bout, unsigned short max_len)
 
 unsigned char Uart4HaveData (void)
 {
+#ifdef USE_UART4_NEWLINE_BY_TIMEOUT
+    if ((uart4_have_data) &&
+	(!uart4_timeout))
+	return 1;
+    else
+	return 0;
+
+#else
     return uart4_have_data;
+#endif
 }
 
 
@@ -805,23 +844,29 @@ void UART4_IRQHandler (void)
     {
         dummy = UART4->DR & 0x0FF;
 
-        if (prx4 < &rx4buff[SIZEOF_RXDATA - 1])
+        if (prx4 < &rx4buff[SIZEOF_RXDATA4 - 1])
         {
-            if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
+#ifdef USE_UART4_NEWLINE_BY_TIMEOUT	    
+	    *prx4 = dummy;
+	    prx4++;
+	    uart4_timeout = USART_RX_TIMEOUT;
+	    uart4_have_data = 1;
+#else
+            //al /r no le doy bola
+            if (dummy == '\r')
+            {
+            }            
+            else if ((dummy == '\n') || (dummy == 26))		//26 es CTRL-Z
             {
                 *prx4 = '\0';
                 uart4_have_data = 1;
-                // if (LED)
-                // 	LED_OFF;
-                // else
-                // 	LED_ON;
-
             }
             else
             {
                 *prx4 = dummy;
                 prx4++;
-            }
+            }	    
+#endif
         }
         else
             prx4 = rx4buff;    //soluciona problema bloqueo con garbage
@@ -832,7 +877,7 @@ void UART4_IRQHandler (void)
     {
         if (UART4->SR & USART_SR_TXE)
         {
-            if ((ptx4 < &tx4buff[SIZEOF_TXDATA]) && (ptx4 < ptx4_pckt_index))
+            if ((ptx4 < &tx4buff[SIZEOF_TXDATA4]) && (ptx4 < ptx4_pckt_index))
             {
                 UART4->DR = *ptx4;
                 ptx4++;
@@ -867,7 +912,7 @@ void Uart5Config(void)
     prx5 = rx5buff;
 
     //---- Configuro velocidad y opciones del puerto
-    UART5->BRR = UART5_9600;
+    UART5->BRR = UART5_57600;
     // UART5->CR2 |= USART_CR2_STOP_1;	//2 bits stop
     // UART5->CR1 = USART_CR1_RE | USART_CR1_TE | USART_CR1_UE;
     // UART5->CR1 = USART_CR1_RXNEIE | USART_CR1_RE | USART_CR1_UE;	//SIN TX
@@ -910,7 +955,7 @@ void Uart5Send (char * send)
 
 void Uart5SendUnsigned (unsigned char * send, unsigned char size)
 {
-    if ((ptx5_pckt_index + size) < &tx5buff[SIZEOF_TXDATA])
+    if ((ptx5_pckt_index + size) < &tx5buff[SIZEOF_TXDATA5])
     {
         memcpy((unsigned char *)ptx5_pckt_index, send, size);
         ptx5_pckt_index += size;
@@ -925,6 +970,15 @@ unsigned char Uart5ReadBuffer (char * bout, unsigned short max_len)
 
     len = prx5 - rx5buff;
 
+#ifdef USE_UART5_NEWLINE_BY_TIMEOUT
+    if (len < max_len)
+        memcpy(bout, (unsigned char *) rx5buff, len);
+    else
+    {
+        memcpy(bout, (unsigned char *) rx5buff, max_len);
+        len = max_len;
+    }
+#else    
     if (len < max_len)
     {
         //el prx5 siempre llega adelantado desde la int, lo corto con un 0
@@ -935,9 +989,10 @@ unsigned char Uart5ReadBuffer (char * bout, unsigned short max_len)
     }
     else
     {
-        memcpy(bout, (unsigned char *) rx5buff, len);
+        memcpy(bout, (unsigned char *) rx5buff, max_len);
         len = max_len;
     }
+#endif
 
     //ajusto punteros de rx luego de la copia
     prx5 = rx5buff;
@@ -948,7 +1003,16 @@ unsigned char Uart5ReadBuffer (char * bout, unsigned short max_len)
 
 unsigned char Uart5HaveData (void)
 {
+#ifdef USE_UART5_NEWLINE_BY_TIMEOUT
+    if ((uart5_have_data) &&
+	(!uart5_timeout))
+	return 1;
+    else
+	return 0;
+
+#else
     return uart5_have_data;
+#endif
 }
 
 
@@ -967,23 +1031,29 @@ void UART5_IRQHandler (void)
     {
         dummy = UART5->DR & 0x0FF;
 
-        if (prx5 < &rx5buff[SIZEOF_RXDATA - 1])
+        if (prx5 < &rx5buff[SIZEOF_RXDATA5 - 1])
         {
-            if ((dummy == '\n') || (dummy == '\r') || (dummy == 26))		//26 es CTRL-Z
+#ifdef USE_UART5_NEWLINE_BY_TIMEOUT
+	    *prx5 = dummy;
+	    prx5++;
+	    uart5_timeout = USART_RX_TIMEOUT;
+	    uart5_have_data = 1;
+#else
+            //al /r no le doy bola
+            if (dummy == '\r')
+            {
+            }            
+            else if ((dummy == '\n') || (dummy == 26))		//26 es CTRL-Z
             {
                 *prx5 = '\0';
                 uart5_have_data = 1;
-                // if (LED)
-                // 	LED_OFF;
-                // else
-                // 	LED_ON;
-
             }
             else
             {
                 *prx5 = dummy;
                 prx5++;
-            }
+            }	    
+#endif
         }
         else
             prx5 = rx5buff;    //soluciona problema bloqueo con garbage
@@ -994,7 +1064,7 @@ void UART5_IRQHandler (void)
     {
         if (UART5->SR & USART_SR_TXE)
         {
-            if ((ptx5 < &tx5buff[SIZEOF_TXDATA]) && (ptx5 < ptx5_pckt_index))
+            if ((ptx5 < &tx5buff[SIZEOF_TXDATA5]) && (ptx5 < ptx5_pckt_index))
             {
                 UART5->DR = *ptx5;
                 ptx5++;
