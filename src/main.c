@@ -19,6 +19,7 @@
 
 #include "comms_main.h"
 #include "test_functions.h"
+#include "encoders_manager.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -53,21 +54,28 @@ int main (void)
         SysTickError();
 
     // Hardware Tests
-    TF_Hardware_Tests ();
+    // TF_Hardware_Tests ();
 
     // --- main program inits. ---
 
     // Init Usart to Mainboard
     UsartMainConfig ();
+
+    // Init Usart to Encoders
+    UsartEncoder1Config ();
+    UsartEncoder2Config ();
+    UsartEncoder3Config ();
+    UsartEncoder4Config ();    
     
     UsartMainSend ("\r\n -- Encoders Board ver 2.0 init --\r\n");
-
     
     while (1)
     {
-	// Supply_Status ();
 
-	// Comms_Update ();
+	Comms_Main_Update ();
+
+	Encoders_Manager_Update ();
+	
     }
 }
 
@@ -84,6 +92,8 @@ void TimingDelay_Decrement(void)
         timer_standby--;
 
     Usart_Timeouts ();
+
+    Encoders_Manager_Timeouts ();
     
 }
 

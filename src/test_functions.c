@@ -41,7 +41,7 @@ void TF_UsartMain_Encoder4 (void);
 void TF_UsartMain_Encoder1_Top_And_Bottom (void);
 void TF_UsartMain_Encoder4_Top_And_Bottom (void);
 void TF_UsartMain_Encoder_1_4_Top_And_Bottom (void);
-void TF_UsartMain_Encoder_1_4_PowerUp_ShuttingDown (void);
+void TF_UsartMain_Encoder_1_2_3_4_PowerUp_ShuttingDown (void);
 
 
 // Module Functions ------------------------------------------------------------
@@ -55,7 +55,7 @@ void TF_Hardware_Tests (void)
     // TF_UsartMain_Encoder4_Top_And_Bottom ();
 
     // TF_UsartMain_Encoder_1_4_Top_And_Bottom ();
-    TF_UsartMain_Encoder_1_4_PowerUp_ShuttingDown ();    
+    TF_UsartMain_Encoder_1_2_3_4_PowerUp_ShuttingDown ();    
 
 }
 
@@ -376,10 +376,7 @@ void TF_UsartMain_Encoder4 (void)
 
 void TF_UsartMain_Encoder4_Top_And_Bottom (void)
 {
-    char buff [100];
     unsigned char bbuff [100];    
-    unsigned short addr = 0;
-    unsigned short bytes_or_value = 0;
     
     UsartMainConfig ();
 
@@ -453,10 +450,7 @@ void TF_UsartMain_Encoder4_Top_And_Bottom (void)
 
 void TF_UsartMain_Encoder1_Top_And_Bottom (void)
 {
-    char buff [100];
     unsigned char bbuff [100];    
-    unsigned short addr = 0;
-    unsigned short bytes_or_value = 0;
     
     UsartMainConfig ();
 
@@ -530,10 +524,7 @@ void TF_UsartMain_Encoder1_Top_And_Bottom (void)
 
 void TF_UsartMain_Encoder_1_4_Top_And_Bottom (void)
 {
-    char buff [100];
     unsigned char bbuff [100];    
-    unsigned short addr = 0;
-    unsigned short bytes_or_value = 0;
     
     UsartMainConfig ();
 
@@ -660,19 +651,16 @@ void TF_UsartMain_Encoder_1_4_Top_And_Bottom (void)
 }
 
 
-void TF_UsartMain_Encoder_1_4_PowerUp_ShuttingDown (void)
+void TF_UsartMain_Encoder_1_2_3_4_PowerUp_ShuttingDown (void)
 {
-    char buff [100];
-    unsigned char bbuff [100];    
-    unsigned short addr = 0;
-    unsigned short bytes_or_value = 0;
-    
     UsartMainConfig ();
 
     UsartEncoder1Config ();
+    UsartEncoder2Config ();
+    UsartEncoder3Config ();
     UsartEncoder4Config ();
 
-    UsartMainSend("\r\n-- USING ENCODER: 1 and 4 PowerUp ShuttingDown --\r\n");
+    UsartMainSend("\r\n-- USING ENCODER: 1 to 4 PowerUp ShuttingDown --\r\n");
     
     unsigned short state = 0;
     int cnt = 0;
@@ -685,16 +673,20 @@ void TF_UsartMain_Encoder_1_4_PowerUp_ShuttingDown (void)
 	    switch (state)
 	    {
 	    case 0:
-		// powerup 1 and 4
+		// powerup 1 to 4
 		Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0010);
-		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000B);		
+		Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000B);
+		Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0010);
+		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000B);
 		state++;
 		break;
 
 	    case 1:
 		// blank 1 and 4
 		Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000F);
-		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);		
+		Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000A);
+		Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000F);
+		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);
 		
 		if (cnt < 5)
 		{
@@ -711,14 +703,18 @@ void TF_UsartMain_Encoder_1_4_PowerUp_ShuttingDown (void)
 	    case 2:
 		// shutting down 1 and 4
 		Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0011);
-		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000C);		
+		Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000C);
+		Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0011);
+		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000C);
 		state++;
 		break;
 
 	    case 3:
 		// blank 1 and 4
 		Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000F);
-		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);
+		Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000A);
+		Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000F);
+		Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);		
 		
 		if (cnt < 5)
 		{

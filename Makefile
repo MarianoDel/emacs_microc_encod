@@ -79,6 +79,7 @@ SRC += ./src/utils.c
 SRC += ./src/test_functions.c
 SRC += ./src/encoder_utils.c
 SRC += ./src/crc_enc.c
+SRC += ./src/encoders_manager.c
 
 
 ## Core Support
