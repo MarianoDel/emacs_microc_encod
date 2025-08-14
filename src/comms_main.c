@@ -89,6 +89,11 @@ static void Comms_Main_Messages (char * msg_str)
 	Encoders_Manager_Rpi_Set (0);
 	UsartMainSend (s_ans_ok);
     }
+    else if (strncmp (msg_str, "poweroff", sizeof("poweroff") - 1) == 0)
+    {
+	Encoders_Manager_Rpi_Set (0);
+    }
+    
     
     // else
     //     Usart3Send(s_ans_nok);
