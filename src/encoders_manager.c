@@ -73,11 +73,16 @@ void Encoders_Manager_Update (void)
 	
 	if (Encoders_Manager_Rpi_Get())
 	{
-	    // blank 1 and 4
+	    // first select 1 to 4
 	    Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0002);
 	    Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x0002);
 	    Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0002);
 	    Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x0002);
+	    // blank 1 to 4
+	    // Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000A);
+	    // Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000F);
+	    // Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000A);
+	    // Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000F);
 
 	    // save init config
 	    for (int i = ENCOD_1; i <= ENCOD_4; i++)
@@ -151,19 +156,19 @@ void Encoders_Manager_PowerUp (void)
     if (encoders_up_down == 0)
     {
 	// powerup 1 to 4
-	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0010);
-	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000B);
-	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0010);
-	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000B);
+	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000B);
+	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x0010);
+	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000B);
+	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x0010);
 	encoders_up_down = 1;
     }
     else if (encoders_up_down == 1)
     {
 	// blank 1 and 4
-	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000F);
-	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000A);
-	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000F);
-	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000F);
+	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000F);
 	encoders_up_down = 0;
     }	
 }
@@ -185,19 +190,19 @@ void Encoders_Manager_ShuttingDown (void)
     if (encoders_up_down == 0)
     {
 	// shutting down 1 and 4
-	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0011);
-	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000C);
-	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0011);
-	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000C);
+	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000C);
+	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x0011);
+	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000C);
+	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x0011);
 	encoders_up_down = 1;
     }
     else if (encoders_up_down == 1)
     {
 	// blank 1 and 4
-	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000F);
-	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000A);
-	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000F);
-	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000F);
+	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000A);
+	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000F);
 	encoders_up_down = 0;
     }	
 }
@@ -317,13 +322,13 @@ void Encoders_Manager_Check_Enc1 (unsigned char * waiting_a_read)
 	// UsartMainSend("\r\npage 2\r\n");
     }
 		    
-    if ((val == 13) ||
-	(val == 14))
+    if ((val == 8) ||
+	(val == 9))
     {
-	// page 13 or 14 goto 12
-	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x000C);
-	val = 12;
-	// UsartMainSend("\r\npage 12\r\n");
+	// page 8 or 9 goto 7
+	Encoder_Write_Address_Plain (ENCOD_1, 0x7000, 0x0007);
+	val = 7;
+	// UsartMainSend("\r\npage 7\r\n");
     }
 
     if ((val - 2) != encoders_from_rpi_last[ENCOD_1])
@@ -373,13 +378,13 @@ void Encoders_Manager_Check_Enc2 (unsigned char * waiting_a_read)
 	// UsartMainSend("\r\npage 2\r\n");
     }
 		    
-    if ((val == 8) ||
-	(val == 9))
+    if ((val == 13) ||
+	(val == 14))
     {
-	// page 8 or 9 goto 7
-	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x0007);
-	val = 7;
-	// UsartMainSend("\r\npage 7\r\n");
+	// page 13 or 14 goto 12
+	Encoder_Write_Address_Plain (ENCOD_2, 0x7000, 0x000C);
+	val = 12;
+	// UsartMainSend("\r\npage 12\r\n");
     }
 
     if ((val - 2) != encoders_from_rpi_last[ENCOD_2])
@@ -429,13 +434,13 @@ void Encoders_Manager_Check_Enc3 (unsigned char * waiting_a_read)
 	// UsartMainSend("\r\npage 2\r\n");
     }
 		    
-    if ((val == 13) ||
-	(val == 14))
+    if ((val == 8) ||
+	(val == 9))
     {
-	// page 13 or 14 goto 12
-	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x000C);
-	val = 12;
-	// UsartMainSend("\r\npage 12\r\n");
+	// page 8 or 9 goto 7
+	Encoder_Write_Address_Plain (ENCOD_3, 0x7000, 0x0007);
+	val = 7;
+	// UsartMainSend("\r\npage 7\r\n");
     }
 
     if ((val - 2) != encoders_from_rpi_last[ENCOD_3])
@@ -485,13 +490,13 @@ void Encoders_Manager_Check_Enc4 (unsigned char * waiting_a_read)
 	// UsartMainSend("\r\npage 2\r\n");
     }
 		    
-    if ((val == 8) ||
-	(val == 9))
+    if ((val == 13) ||
+	(val == 14))
     {
-	// page 8 or 9 goto 7
-	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x0007);
-	val = 7;
-	// UsartMainSend("\r\npage 7\r\n");
+	// page 13 or 14 goto 12
+	Encoder_Write_Address_Plain (ENCOD_4, 0x7000, 0x000C);
+	val = 12;
+	// UsartMainSend("\r\npage 12\r\n");
     }
 
     if ((val - 2) != encoders_from_rpi_last[ENCOD_4])

@@ -57,7 +57,7 @@ static void Comms_Main_Messages (char * msg_str)
     {
 	char * pmsg = msg_str + sizeof("enc ") - 1;
 
-	// check no more tha 8 encoders, no more than 16 positions
+	// check no more than 8 encoders, no more than 16 positions
 	if ((*pmsg >= '0') && (*pmsg <= '7'))
 	{
 	    if ((*(pmsg + 1) == ' ') &&
